@@ -61,7 +61,7 @@ timezone: Pacific/Auckland # 新西兰标准时间 (UTC+12)
 
 <!-- Content_START -->
 
-### 2024.07.07
+### 2024.07.11
 
 笔记内容:move 到模組學習，從一開始配置aptos cli 和move 的ide環境
 ```move
