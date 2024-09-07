@@ -61,9 +61,7 @@ timezone: Pacific/Auckland # 新西兰标准时间 (UTC+12)
 
 <!-- Content_START -->
 
-### 2024.07.11
-
-
+### 2024.09.07
 
 - 学习主题： Aptos & Move 模組學習
 - 学习内容总结：
@@ -82,6 +80,5 @@ module 0x42::HELLOWWORLD{
 ````
 一開始寫個hellow world 的move 來作為残酷学习的開始，這個可以print hellow world，然後就沒有了XD
 
-### 2024.07.12
 
 <!-- Content_END -->
