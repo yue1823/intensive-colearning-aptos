@@ -61,9 +61,22 @@ timezone: Pacific/Auckland # 新西兰标准时间 (UTC+12)
 
 <!-- Content_START -->
 
-### 2024.07.11
+### 2024.07.07
 
-笔记内容
+笔记内容:move 到模組學習，從一開始配置aptos cli 和move 的ide環境
+```move
+module 0x42::HELLOWWORLD{
+
+    use std::debug::print;
+    use std::string::utf8;
+
+    #[test]
+    fun test_hello_eorld(){
+        print(&utf8(b"Hello World")); 
+    }
+}
+````
+一開始寫個hellow world 的move 來作為残酷学习的開始，這個可以print hellow world，然後就沒有了XD
 
 ### 2024.07.12
 
