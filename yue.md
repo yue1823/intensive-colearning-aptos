@@ -57,6 +57,15 @@ timezone: Pacific/Auckland # 新西兰标准时间 (UTC+12)
   你好，我是一個萌新小白，我也是founder of diffusion ，希望可以讓我的項目更加高的完成度和提升對move語言的了解
 2. 你认为你会完成本次残酷学习吗？
 那是當然的
+
+# 項目
+
+## 項目名稱：diffusion
+
+## testnet 地址：`0x7776f4ac2f3a13f751b966220b0e68e0b5688682c31e4f93cbf12ce1cea4a7b9`
+
+這個是用來參加黑客松的項目，可以做到下注不同的比賽
+
 ## Notes
 
 <!-- Content_START -->
@@ -1470,5 +1479,249 @@ module 0x1::demo {
 今天來學習 object 的用法和理解
 `https://www.youtube.com/watch?v=bny8hBEpBmw`
 
+### 2024.09.22
+
+```move
+module dapp::aptos_discover {
+
+    use std::option;
+    use std::signer;
+    use std::signer::address_of;
+    use std::string;
+    use std::string::utf8;
+    use aptos_std::smart_vector;
+    use aptos_framework::account;
+    use aptos_framework::account::{SignerCapability, create_resource_address, create_signer_with_capability};
+    use aptos_framework::object;
+    use aptos_framework::object::{disable_ungated_transfer, DeleteRef};
+    use aptos_framework::primary_fungible_store::create_primary_store_enabled_fungible_asset;
+    use aptos_framework::resource_account::create_resource_account;
+    use aptos_framework::fungible_asset;
+    #[test_only]
+    use std::vector;
+    #[test_only]
+    use aptos_std::debug;
+    #[test_only]
+    use aptos_framework::object::ObjectCore;
+
+    const Seed:vector<u8> = b"discover";
+
+    //Error  code
+    const No_q_set:u64=1;
+    const Not_exist_problem_set :u64 = 2;
+    const No_this_image :u64 = 3;
+
+    struct Resource_store_object has key {
+        object:address
+    }
+    struct ChainMark_Object_cap has key , store {
+        trans_cap : object::TransferRef,
+        exten_cap : object::ExtendRef
+    }
+    struct ChainMark_FA_cap has key,store{
+        mint_cap:fungible_asset::MintRef,
+        burn_cap : fungible_asset::BurnRef,
+        trans_cap  : fungible_asset::TransferRef
+    }
+
+    struct Object_cap has key , store {
+        trans_cap : object::TransferRef,
+        del_cap : object::DeleteRef,
+       exten_cap : object::ExtendRef
+    }
+
+
+    struct ResourceCap has key{
+        cap:SignerCapability
+    }
+    //owner of organiztion
+    struct Organization has key,store{
+        name:string::String,
+        address:address,
+        organization_discribe:string::String
+    }
+    //problem want to soleve
+    struct Problem has key ,store{
+        problem:string::String,
+        owner_address:address,
+        date:string::String
+    }
+
+    //data which want to aptos community to mark
+    struct Q_set has key,store {
+        img_url_set : smart_vector::SmartVector<string::String>,
+        true_number:u64,
+        false_number:u64,
+        answer_number:u64,
+        reward:u64,
+    }
+    // user answer data
+    struct User_answer has key,store{
+        image:string::String,
+        index_of_smart_vector:u64,
+        answer:bool,
+        user_address:address,
+        date:string::String,
+    }
+    /// store all data
+    struct Problem_set has key {
+        owner:Organization,
+        problem_details:Problem,
+        question:Q_set,
+        true_answer:smart_vector::SmartVector<User_answer>,
+        false_answer:smart_vector::SmartVector<User_answer>
+    }
+
+    // for Organization
+
+    public entry fun create_problem_set (caller:&signer,problem1:string::String,date1:string::String,descibe:string::String,name_of_Organization:string::String,image_vector:vector<string::String>,reward_budget:u64) acquires  ResourceCap {
+        let new_organ = Organization{
+            name:name_of_Organization,
+            address:address_of(caller),
+            organization_discribe:descibe
+        };
+        let new_smart_vector =smart_vector::empty<string::String>();
+        smart_vector::add_all(&mut new_smart_vector,image_vector);
+        let new_q_set = Q_set{
+            img_url_set:new_smart_vector,
+            true_number:0,
+            false_number:0,
+            answer_number:0,
+            reward:reward_budget
+        };
+        let new_Problem = Problem{
+            problem:problem1,
+            owner_address:address_of(caller),
+            date:date1
+        };
+
+        let resource =&borrow_global<ResourceCap>(create_resource_address(&@dapp,Seed)).cap;
+        let resouces_signer = &create_signer_with_capability(resource);
+
+        let new_object = &object::create_object(address_of(resouces_signer));
+        let object_signer = &object::generate_signer(new_object);
+
+        let new_del_red = object::generate_delete_ref(new_object);
+        let new_trans_ref = object::generate_transfer_ref(new_object);
+        let new_extent_ref = object::generate_extend_ref(new_object);
+
+        let new_problem_set = Problem_set{
+            owner:new_organ,
+            problem_details:new_Problem,
+            question:new_q_set,
+            true_answer:smart_vector::empty<User_answer>(),
+            false_answer:smart_vector::empty<User_answer>()
+        };
+        move_to(caller,Object_cap{
+            trans_cap:new_trans_ref,
+            del_cap:new_del_red,
+            exten_cap:new_extent_ref,
+        });
+
+        move_to(resouces_signer,Resource_store_object{object:address_of(object_signer)});
+        move_to(object_signer,new_problem_set);
+    }
+
+    // for user
+
+    public entry fun answer_question(caller:&signer,image_url:string::String,answer1:bool,data1:string::String,problem_set_address:address) acquires Problem_set, ResourceCap {
+        let resource = &borrow_global<ResourceCap>(create_resource_address(&@dapp,Seed)).cap;
+        let resource_signer = &create_signer_with_capability(resource);
+        assert!(exists<Problem_set>(problem_set_address),Not_exist_problem_set);
+        let index = find_index(problem_set_address,image_url);
+        let borrow = borrow_global_mut<Problem_set>(problem_set_address);
+        assert!(index != 9999999,No_this_image);
+        let conf = object::create_object(address_of(resource_signer));
+        let new_user_anser = User_answer{
+            image:image_url,
+            index_of_smart_vector:index,
+            answer:answer1,
+            user_address:address_of(caller),
+            date:data1
+        };
+        if (answer1){
+            smart_vector::push_back(&mut borrow.true_answer,new_user_anser);
+            borrow.question.true_number=borrow.question.true_number+1;
+            borrow.question.answer_number= borrow.question.answer_number+1;
+        }else{
+            smart_vector::push_back(&mut borrow.false_answer,new_user_anser);
+            borrow.question.false_number=  borrow.question.false_number+1;
+            borrow.question.answer_number= borrow.question.answer_number+1;
+        }
+    }
+
+    //logic
+
+    fun find_index (caller:address,image_target:string::String):u64 acquires Problem_set {
+        let length = smart_vector::length(&borrow_global<Problem_set>(caller).question.img_url_set);
+        let index = 9999999;
+        let  i= 0;
+        while (i < length ){
+            let borrow_target = smart_vector::borrow(&borrow_global<Problem_set>(caller).question.img_url_set,i);
+            if(&image_target == borrow_target){
+                index = i;
+            };
+            i = i+1;
+        };
+        return index
+    }
+
+    fun init_module(caller:&signer) {
+        let (resource_signer, resource_cap) = account::create_resource_account(
+                    caller,
+                Seed
+                );
+        move_to(&resource_signer,ResourceCap{cap:resource_cap});
+        let new_object_cons = object::create_named_object(&resource_signer,Seed);
+        let new_trans_ref = object::generate_transfer_ref(&new_object_cons);
+        let new_extent_ref = object::generate_extend_ref(&new_object_cons);
+
+        disable_ungated_transfer( &new_trans_ref);
+        let object_signer = &object::generate_signer(&new_object_cons);
+         create_primary_store_enabled_fungible_asset(
+             &new_object_cons,
+         option::none(),
+             utf8(b"ChainMark Coin"),
+             utf8(b"CMC"),
+             8,
+             utf8(b"https://raw.githubusercontent.com/dylan12386/aptos_discover/refs/heads/main/ChainMARK.jpeg"),
+             utf8(b"https://github.com/dylan12386/aptos_discover")
+         );
+        let mint_ref = fungible_asset::generate_mint_ref(&new_object_cons);
+        let burn_ref = fungible_asset::generate_burn_ref(&new_object_cons);
+        let tran_ref = fungible_asset::generate_transfer_ref(&new_object_cons);
+        move_to(&resource_signer,ChainMark_FA_cap{
+            mint_cap:mint_ref,
+            burn_cap:burn_ref,
+            trans_cap:tran_ref
+        });
+        move_to(&resource_signer,ChainMark_Object_cap{
+            trans_cap:new_trans_ref,
+            exten_cap:new_extent_ref,
+        })
+    }
+
+
+    // test
+    #[test(caller=@dapp,organisztion_signer=@0x4)]
+    fun test_init (caller:&signer,organisztion_signer:&signer) acquires ResourceCap, ChainMark_Object_cap {
+        init_module(caller);
+        let image_vector =vector::empty<string::String>();
+        vector::push_back(&mut image_vector,utf8(b"aaa"));
+        vector::push_back(&mut image_vector,utf8(b"bbb"));
+        create_problem_set(organisztion_signer,utf8(b"solve image of A"),utf8(b"2024/09/22 - 2024/12/15"),utf8(b"help us mark  down the image isn't A , we will use it to tran AI "),utf8(b"Test Company"),image_vector,100000000);
+
+        borrow_global<Problem_set>()
+
+        answer_question();
+        let object_extend = &borrow_global<ChainMark_Object_cap>(create_resource_address(&@dapp,Seed)).exten_cap;
+        let object_signer = &object::generate_signer_for_extending(object_extend);
+        debug::print(&object::address_to_object<ObjectCore>(address_of(object_signer)));
+    }
+}
+
 ```
+寫一個object的用法，但是沒有寫完
+
+
 <!-- Content_END -->
