@@ -1723,5 +1723,9 @@ module dapp::aptos_discover {
 ```
 寫一個object的用法，但是沒有寫完
 
+### 2024.09.23
 
+`https://aptos.dev/en/build/create-aptos-dapp`
+
+使用create aptos dapp 去做一個新的模板，可以直接改去用
 <!-- Content_END -->
