@@ -1728,4 +1728,34 @@ module dapp::aptos_discover {
 `https://aptos.dev/en/build/create-aptos-dapp`
 
 使用create aptos dapp 去做一個新的模板，可以直接改去用
+
+### 2024.09.24
+
+```move
+fun increase_CHP (caller:&signer,user1:address) acquires ChainMark_FA_cap {
+
+        let obj_address = object::create_object_address(&create_resource_address(&@dapp,Seed),Seed);
+        let meta_data = object::address_to_object<Metadata>(obj_address);
+        let borrow = borrow_global<ChainMark_FA_cap>(obj_address);
+        // let obj_address = borrow_global<Resource_store_object>(create_resource_address(&@dapp,Seed)).object;
+        // let new_coin=fungible_asset::mint(&borrow.mint_cap,100000000);
+         primary_fungible_store::mint(&borrow.mint_cap,signer::address_of(caller),100000000);
+
+        primary_fungible_store::mint(&borrow.mint_cap,user1,100000000);
+
+         debug::print(&utf8(b"caller CHC Balance"));
+         debug::print(& primary_fungible_store::balance(signer::address_of(caller),meta_data));
+
+        debug::print(&utf8(b"user CHC Balance"));
+        debug::print(& primary_fungible_store::balance(user1,meta_data));
+
+        // let new_object = object::address_to_object<>(obj_address);
+        //fungible_asset::deposit(caller);
+        //primary_fungible_store::deposit(signer::address_of(caller),new_coin);
+
+    }
+
+```
+更進一步去了解onbject 要怎麼做一個v2 的代幣
+
 <!-- Content_END -->
