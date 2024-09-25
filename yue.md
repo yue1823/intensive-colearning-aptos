@@ -1758,4 +1758,61 @@ fun increase_CHP (caller:&signer,user1:address) acquires ChainMark_FA_cap {
 ```
 更進一步去了解onbject 要怎麼做一個v2 的代幣
 
+### 2024.09.25
+
+```move
+// test
+    #[test(caller=@dapp,organisztion_signer=@0x4,user1=@0x789)]
+    fun test_init (caller:&signer,organisztion_signer:&signer,user1:&signer) acquires ResourceCap, Problem_set, Resource_store_object, ChainMark_FA_cap, Object_cap {
+        init_module(caller);
+        let image_vector =vector::empty<string::String>();
+        vector::push_back(&mut image_vector,utf8(b"aaa"));
+        vector::push_back(&mut image_vector,utf8(b"bbb"));
+        create_problem_set(organisztion_signer,utf8(b"solve image of A"),utf8(b"2024/09/22 - 2024/12/15"),utf8(b"help us mark  down the image isn't A , we will use it to tran AI "),utf8(b"Test Company"),image_vector,100000000);
+        let address1 = borrow_global<Resource_store_object>(create_resource_address(&@dapp,Seed)).object;
+        answer_question(user1,utf8(b"aaa"),true,utf8(b"2024/09/22"),address1);
+        // let object_extend = &borrow_global<ChainMark_Object_cap>(create_resource_address(&@dapp,Seed)).exten_cap;
+        // let object_signer = &object::generate_signer_for_extending(object_extend);
+        // debug::print(&object::address_to_object<ObjectCore>(address_of(object_signer)));
+        // debug::print(borrow_global<Problem_set>(address1));
+        // debug::print(&image_vector() );
+
+        //increase_CHP(caller);
+        //withdraw_CHC(signer::address_of(caller),user1);
+
+
+
+        //del_object_owner(organisztion_signer);
+
+        let obj_address = object::create_object_address(&create_resource_address(&@dapp,Seed),Seed);
+        let obj_metadata = object::address_to_object<Metadata>(obj_address);
+
+        // debug::print(&utf8(b"caller CHC Balance"));
+        // debug::print(& primary_fungible_store::balance(signer::address_of(caller),obj_metadata));
+        //
+        // debug::print(&utf8(b"user CHC Balance"));
+        // debug::print(& primary_fungible_store::balance(signer::address_of(user1),obj_metadata));
+        debug::print(&utf8(b"Resources own"));
+        debug::print(&is_owner(obj_metadata,create_resource_address(&@dapp,Seed)));
+
+        debug::print(&utf8(b"Organization own"));
+        debug::print(&is_owner(obj_metadata,signer::address_of(organisztion_signer)));
+
+        debug::print(&utf8(b"User own"));
+        debug::print(&is_owner(obj_metadata,signer::address_of(user1)));
+
+        transfer_object_owner(organisztion_signer,signer::address_of(user1));
+
+        debug::print(&utf8(b"Resources own"));
+        debug::print(&is_owner(obj_metadata,create_resource_address(&@dapp,Seed)));
+
+        debug::print(&utf8(b"Organization own"));
+        debug::print(&is_owner(obj_metadata,signer::address_of(organisztion_signer)));
+
+        debug::print(&utf8(b"User own"));
+        debug::print(&is_owner(obj_metadata,signer::address_of(user1)));
+    }
+
+```
+繼續調object 的用法
 <!-- Content_END -->
