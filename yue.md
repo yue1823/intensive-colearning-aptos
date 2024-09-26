@@ -1815,4 +1815,43 @@ fun increase_CHP (caller:&signer,user1:address) acquires ChainMark_FA_cap {
 
 ```
 繼續調object 的用法
+
+### 2024.09.26
+
+最後兩天寫完transfer 和del obj 的fun了
+
+```move
+
+ public entry fun del_object_owner (caller:&signer) acquires Object_cap,  Resource_store_object {
+        // let object_cap = &borrow_global<Object_cap>(signer::address_of(caller)).del_cap;
+        // debug::print(&utf8(b"exist object cap"));
+        // debug::print(&exists<Object_cap>(signer::address_of(caller)));
+        let problem_set_object_address = borrow_global< Resource_store_object >(create_resource_address(&@dapp,Seed)).object;
+        let  Object_cap { trans_cap,del_cap,exten_cap } = move_from<Object_cap>(problem_set_object_address);
+        // let object_signer = &object::generate_signer_for_extending(&exten_cap);
+        //let borrow_problem_set = borrow_global<Problem_set>(signer::address_of(object_signer));
+        let object_core = object::address_to_object<ObjectCore>(problem_set_object_address);
+
+        assert!(object::is_owner(object_core,signer::address_of(caller)) == true || signer::address_of(caller) == @admin, NOT_owner_or_admin );
+        // debug::print(&utf8(b"exist object cap"));
+        // debug::print(&object_cap);
+        object::delete(del_cap);
+    }
+    public entry fun transfer_object_owner (caller:&signer,to:address) acquires Object_cap, Problem_set, Resource_store_object {
+        let  Object_cap { trans_cap,del_cap,exten_cap } = move_from<Object_cap>(signer::address_of(caller));
+        let object_signer = &object::generate_signer_for_extending(&exten_cap);
+        let borrow_problem_set = borrow_global<Problem_set>(signer::address_of(object_signer));
+        let problem_set_object_address = borrow_global< Resource_store_object >(create_resource_address(&@dapp,Seed)).object;
+        let object_core = object::address_to_object<ObjectCore>(problem_set_object_address);
+        assert!( borrow_problem_set.owner.address == signer::address_of(caller) || signer::address_of(caller) == @admin, NOT_owner_or_admin );
+        let liner_transfer = object::generate_linear_transfer_ref(&trans_cap);
+
+        move_to(object_signer,Object_cap{
+            trans_cap,del_cap,exten_cap
+        });
+        object::transfer_with_ref(liner_transfer,to);
+    }
+```
+
+
 <!-- Content_END -->
