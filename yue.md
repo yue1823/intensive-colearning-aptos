@@ -1853,5 +1853,13 @@ fun increase_CHP (caller:&signer,user1:address) acquires ChainMark_FA_cap {
     }
 ```
 
+### 2024.09.27
+
+最後一天
+
+完成了diffusion的 fun 和新的object合約
+testnet :
+`0x66cd3cc5d2d724d9eacc30a35cf61aef36c0fe69bc1c7ecb9444cae9a39aecd2`
+
 
 <!-- Content_END -->
