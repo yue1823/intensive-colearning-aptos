@@ -66,6 +66,11 @@ timezone: Pacific/Auckland # 新西兰标准时间 (UTC+12)
 
 這個是用來參加黑客松的項目，可以做到下注不同的比賽
 
+Diffusion 是一個基於 Aptos 區塊鏈的 DeFi 聚合器，集成了交換（swap）、去中心化自治組織（DAO）類功能以及下注系統的三合一平台。我們利用 Move 語言和 Move Prover 架構了高度安全的智能合約，並創新推出了更安全的轉帳功能和下注系統，進一步提升了用戶的安全體驗。
+
+Diffusion 結合了多項 Aptos 的特色技術，以及合作夥伴的創新技術，包括無匙帳戶、Nodit、Telegram 機器人和 Mizu Wallet。我們致力於透過這些技術為 Aptos 社區帶來全新的去中心化金融體驗。
+
+
 ## Notes
 
 <!-- Content_START -->
