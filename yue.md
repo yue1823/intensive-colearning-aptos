@@ -1859,7 +1859,7 @@ fun increase_CHP (caller:&signer,user1:address) acquires ChainMark_FA_cap {
 
 完成了diffusion的 fun 和新的object合約
 testnet :
-`0x66cd3cc5d2d724d9eacc30a35cf61aef36c0fe69bc1c7ecb9444cae9a39aecd2`
-
+`0x66cd3cc5d2d724d9eacc30a35cf61aef36c0fe69bc1c7ecb9444cae9a39aecd2` - chainmark
+`0x7776f4ac2f3a13f751b966220b0e68e0b5688682c31e4f93cbf12ce1cea4a7b9` - diffusion
 
 <!-- Content_END -->
